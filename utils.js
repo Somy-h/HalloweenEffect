@@ -47,44 +47,6 @@ export function insideDetectOctagonIdx(x1, y1, x2, y2, cx, cy, centerX, centerY,
   return result;
 }
 
-// return index (side of octagon) if (x, y) is inside one of the side
-// export function getDetectSide(centerX, centerY, x, y) {
-
-//   let result;
-//   if (x - centerX > 0) {
-//     if (y - centerY > 0) { // 0, 1
-//       if (Math.atan((y - centerY) /(x - centerX ))* 180 / Math.PI < 45) {
-//         result = 0;
-//       } else {
-//         result = 1;
-//       }
-//     } else { // 6, 7
-//       if (Math.atan((centerY - y) /(x - centerX ))* 180 / Math.PI < 45) {
-//         result = 7;
-//       } else {
-//         result = 6;
-//       }
-//     }
-//   } else {
-//     if (y - centerY > 0) { // 2, 3
-//       if (Math.atan((y - centerY) /(centerX - x))* 180 / Math.PI < 45) {
-//           result = 3;
-//       } else {
-//         result = 2;
-//       }
-//     } else { // 4, 5
-//       if (Math.atan((centerY - y) /(centerX - x))* 180 / Math.PI < 45) {
-//           result = 4;
-//       } else {
-//         result = 5;
-//       }
-//     }
-//   }
-  
-//   //console.log(result);
-//   return result;
-// }
-
 export function getDetectSide(centerX, centerY, x, y) {
 
   let angle = Math.atan((y - centerY) /(x - centerX ))* 180 / Math.PI;
