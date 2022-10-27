@@ -1,9 +1,10 @@
 import { lineCircle, insideDetectOctagonIdx } from "./utils.js";
-const BOUNCE = 0.92;
+const BOUNCE = 0.9;
 
 // Reference from 
 // https://www.youtube.com/watch?v=dXhAQbE8iBg
-export class BounceString {
+
+export default class BounceString {
   // responseIndex : only for response for 1/8 sides of octagon
   constructor(posA, posB, color, responseIndex) {
   
@@ -42,7 +43,7 @@ export class BounceString {
         y: middleY + controlValY,
         ox: middleX + controlValX,  // original point
         oy: middleY + controlValY,
-        vx: 0,        // vibration value
+        vx: 0,                      // vibration value
         vy: 0,
       },
       { // end point
@@ -55,7 +56,7 @@ export class BounceString {
       },
     ];
 
-    this.detect = 20;
+    this.detect = 30;
     this.color = color;
   }
 
@@ -91,9 +92,8 @@ export class BounceString {
       let ty = (this.points[1].oy + moveY) /2;
       this.points[1].vx = tx - this.points[1].x;
       this.points[1].vy = ty - this.points[1].y;
-
     } else {
-      this.detect = 20;
+      this.detect = 30;
       let tx = this.points[1].ox;
       let ty = this.points[1].oy;
       this.points[1].vx += tx - this.points[1].x;
@@ -122,4 +122,3 @@ export class BounceString {
     ctx.stroke();   
   }
 }
-

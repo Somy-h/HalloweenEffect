@@ -1,5 +1,5 @@
 
-export class TextEffect {
+export default class TextEffect {
   constructor(text, color, speed) {
     this.text = text;
     this.color = color;
@@ -11,7 +11,7 @@ export class TextEffect {
     this.opacityVal = 0.05;
   }
 
-  draw(ctx, t, height) {
+  draw(ctx, t, width, height) {
     if (this.prevTime == 0) {
       this.prevTime =t;
     }
@@ -19,17 +19,18 @@ export class TextEffect {
     if (now > 1000/this.speed) {
       this.prevTime = t;
       this.opacity += this.opacityVal;
-      if (this.opacity >= 0.9 || this.opacity <= 0) {
+      if (this.opacity >= 0.8 || this.opacity <= 0) {
         this.opacityVal *= -1;
       }
     }
   
-    const fontWidth = 40;
-    const fontSize = 60;
-    const fontName = 'sans';
+    const fontWidth = 50;
+    const fontSize =  width/18;
+    const fontName = 'Hind';
     ctx.fillStyle = `rgba(0, 0, 0, ${this.opacity})`
     //ctx.font = "50px Hind";
     ctx.font = `${fontWidth} ${fontSize}px ${fontName}`;
+    ctx.beginPath();
     ctx.fillText(this.text, 50, height - 50);
   }
 

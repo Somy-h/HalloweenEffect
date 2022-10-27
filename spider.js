@@ -1,7 +1,7 @@
 import {getRectPointFromCenter} from './utils.js';
 const PI2 = Math.PI * 2;
 
-export class Spider {
+export default class Spider {
   constructor(x, y, radius, src, speed  = 0) {
     this.radius = radius;
     this.vx = speed;
@@ -61,6 +61,5 @@ export class Spider {
     ctx.drawImage(this.img, 
       this.curFrame * this.spiderWidth, 0, this.spiderWidth, this.spiderHeight,
       newPos.x, newPos.y, this.radius + 10, this.radius);
-
   }
 } 

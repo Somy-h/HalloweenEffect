@@ -4,6 +4,33 @@ export function distance(x1, y1, x2, y2) {
   return Math.sqrt(x * x + y * y);
 }
 
+
+export function collide(x1, y1, x2, y2, radius) {
+  if (distance(x1, y1, x2, y2) <= radius) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export function getBWValue(red, green, blue, isReversed) {
+  const detect = 2;
+  if (!isReversed) {
+    return 255 - Math.floor((red + green + blue) / detect)
+  } else {
+    return Math.floor((red + green + blue) / detect);
+  }
+}
+
+//The Uint8ClampedArray contains height × width × 4 bytes of data, 
+//with index values ranging from 0 to (height×width×4)-1.
+
+export function getColorIndices(x, y, width) {
+  const red = (x + y * width) * 4;
+  return [red, red + 1, red + 2, red + 3];
+}
+
+
 export function pointCircle(px, py, cx, cy, r) {
   return (distance(px, py, cx, cy) <= r) 
 }

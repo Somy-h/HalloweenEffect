@@ -1,22 +1,27 @@
-import { BounceString } from './bounceString.js';
-import { Spider } from './spider.js';
-import { getDetectSide } from "./utils.js";
-import { TextEffect } from './textEffect.js';
+import BounceString from './bounceString.js';
+import Spider from './spider.js';
+import PumpkinDot from "./pumpkinDot.js";
+import Ripple from "./ripple.js";
+import TextEffect from './textEffect.js';
+import SoundEffect from "./soundEffect.js"
+import { getDetectSide, collide, getColorIndices} from "./utils.js";
+
+
 class App {
   constructor() {
     this.canvas = document.createElement('canvas');
     document.body.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d');
-    this.canvas.style.background = '#eb6123';
 
-    this.pixelRatio =  1;
-    //this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
-    window.addEventListener('resize', this.resize.bind(this));
+    //this.pixelRatio =  1;
+    this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
     
-    this.resize();
     this.init();
-
+    this.resize();
+    
+    window.addEventListener('resize', this.resize.bind(this));
     document.addEventListener('pointermove', this.onMove.bind(this));
+    this.canvas.addEventListener('click', this.handleClick.bind(this), false);
 
     window.requestAnimationFrame(this.animate.bind(this));
   }
@@ -24,6 +29,15 @@ class App {
   init() {
     this.moveX = -500;
     this.moveY = -500;
+    this.radius = 10;
+    this.pixelSize = 30;
+    this.pumpkinDots = [];
+    this.isClicked = false;
+    this.density = 10;
+    this.strings = [];
+    this.topSpiders = [];
+    this.webColor = 'black';
+    
   }
 
   resize() {
@@ -32,30 +46,35 @@ class App {
 
     this.canvas.width = this.width * this.pixelRatio;
     this.canvas.height = this.height * this.pixelRatio;
+
     this.ctx?.scale(this.pixelRatio, this.pixelRatio);
     this.setup();
   }
 
   setup() {
-    this.strings = [];
-    this.topSpiders = [];
-    this.webColor = 'black';
+  
+    //set up spider web
     this.setupWeb();
 
-    let src = "./images/1.png"
+    //set up spiders
+    let src = "./resources/1.png"
     this.spider = new Spider(this.width/2, this.height/2, 40, src);
-    src = "./images/spritesheet.png";
+    src = "./resources/spritesheet.png";
     this.topSpiders.push(new Spider(this.width/4, 0, 38, src, 1));
     this.topSpiders.push(new Spider(this.width/3, 0, 38, src, 0.5));
     this.topSpiders.push(new Spider(this.width/4*3, 0, 38, src, 0.7));
     
     //text- happy halloween by defaut
     this.text = new TextEffect("👻 Happy Halloween 👻", 'black', 5);
+    this.ripple = new Ripple();
+    this.sound = new SoundEffect();
+
+    this.ripple.resize(this.width, this.height);
   }
 
   setupWeb() {
     const radius = Math.min(this.width, this.height) / 2 - 70;
-    this.density = 10;
+    
     
     const gap = radius / this.density;
     this.centerX = Math.round(this.width / 2);
@@ -82,30 +101,99 @@ class App {
     }
   }
 
+  // Ripple starts
+  handleClick(event) {
+    console.log("click");
+    this.isClicked = true;
+    this.sound.play();
+    
+    for (let i = 0; i < this.pumpkinDots.length; i++) {
+      this.pumpkinDots[i].reset();
+    }
+
+    this.imgData = this.ctx?.getImageData(0, 0, this.width, this.height);
+    console.log(this.imgData);
+    this.drawpumpkinDots();
+    this.ripple.start(event.offsetX, event.offsetY);
+  }
+
+  drawpumpkinDots() {
+    this.pumpkinDots = [];
+
+    this.columns = Math.ceil(this.width / this.pixelSize);
+    this.rows = Math.ceil(this.height / this.pixelSize);
+
+    for (let i = 0; i < this.rows; i++) {
+      const y = (i + 0.5) * this.pixelSize;
+      const pixelY = Math.max(Math.min(y, this.height), 0);
+
+      for (let j = 0; j < this.columns; j++) {
+        const x = (j + 0.5) * this.pixelSize;
+        const pixelX = Math.max(Math.min(x, this.width), 0);
+
+        const [redIdx, greenIdx, blueIdx] = getColorIndices(pixelX, pixelY, this.width);
+        const red = this.imgData.data[redIdx];
+        const green = this.imgData.data[greenIdx];
+        const blue = this.imgData.data[blueIdx];
+        
+        const dot = new PumpkinDot(
+          x, y,
+          this.radius,
+          this.pixelSize,
+          red, green, blue
+        );
+
+        this.pumpkinDots.push(dot);
+      }
+    }
+    //console.log(this.pumpkinDots)
+  }
+
   animate(t) {
     this.draw(t);
     window.requestAnimationFrame(this.animate.bind(this));
   }
 
   draw(t) {
-    this.ctx?.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    // // draw webs
-    this.strings?.forEach(bounceStrings =>
-      bounceStrings.forEach(bounceString => 
-        bounceString.draw(this.ctx, this.spider.x, this.spider.y, this.centerX, this.centerY, this.detectIdx)
-      )
-    );
+    if (this.isClicked) {
+      // riffle when mouse click
+      this.ripple.draw(this.ctx);
 
-    this.drawWebCenterLines(); 
-  
-    // draw spider by mouse interaction
-    this.spider?.draw(this.ctx);
+      for (let i = 0; i < this.pumpkinDots?.length; i++) {
+        const dot = this.pumpkinDots[i];
+        if (collide (
+          dot.x, dot.y,
+          this.ripple.x, this.ripple.y,
+          this.ripple.radius
+        )) {
+          dot.draw(this.ctx);
+        }
+      }
 
-    // draw top spirders
-    this.topSpiders?.forEach(spider => spider.drawWithWeb(this.ctx, t, this.height, this.webColor));
-    this.text.draw(this.ctx, t, this.height);
-    this.moveX = this.spider.x;
-    this.moveY = this.spider.y;
+    } else {
+        //background
+        this.ctx?.beginPath();
+        this.ctx.fillStyle= '#eb6123';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // draw webs        
+        this.drawWebCenterLines(); 
+        this.strings?.forEach(bounceStrings =>
+          bounceStrings.forEach(bounceString => 
+            bounceString.draw(this.ctx, this.spider.x, this.spider.y, this.centerX, this.centerY, this.detectIdx)
+          )
+        );
+
+        // draw spider by mouse interaction
+        this.spider?.draw(this.ctx);
+
+        // draw top spirders
+        this.topSpiders?.forEach(spider => spider.drawWithWeb(this.ctx, t, this.height, this.webColor));
+        this.text.draw(this.ctx, t, this.width, this.height);
+        this.moveX = this.spider.x;
+        this.moveY = this.spider.y;
+    }
+
   }
 
   drawWebCenterLines() {
