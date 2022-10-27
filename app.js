@@ -16,7 +16,7 @@ class App {
     //this.pixelRatio =  1;
     this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
     
-    this.init();
+    
     this.resize();
     
     window.addEventListener('resize', this.resize.bind(this));
@@ -41,6 +41,8 @@ class App {
   }
 
   resize() {
+    this.init();
+    
     this.width = document.body.clientWidth;
     this.height = document.body.clientHeight;
 
