@@ -15,8 +15,6 @@ class App {
 
     //this.pixelRatio =  1;
     this.pixelRatio = window.devicePixelRatio > 1 ? 2 : 1;
-    
-    
     this.resize();
     
     window.addEventListener('resize', this.resize.bind(this));
@@ -37,7 +35,6 @@ class App {
     this.strings = [];
     this.topSpiders = [];
     this.webColor = 'black';
-    
   }
 
   resize() {
@@ -54,7 +51,6 @@ class App {
   }
 
   setup() {
-  
     //set up spider web
     this.setupWeb();
 
@@ -105,17 +101,15 @@ class App {
 
   // Ripple starts
   handleClick(event) {
-    console.log("click");
     this.isClicked = true;
     this.sound.play();
-    
+     
+    this.imgData = this.ctx?.getImageData(0, 0, this.width, this.height);
+    this.drawpumpkinDots();
+
     for (let i = 0; i < this.pumpkinDots.length; i++) {
       this.pumpkinDots[i].reset();
-    }
-
-    this.imgData = this.ctx?.getImageData(0, 0, this.width, this.height);
-    console.log(this.imgData);
-    this.drawpumpkinDots();
+    } 
     this.ripple.start(event.offsetX, event.offsetY);
   }
 
@@ -144,11 +138,9 @@ class App {
           this.pixelSize,
           red, green, blue
         );
-
         this.pumpkinDots.push(dot);
       }
     }
-    //console.log(this.pumpkinDots)
   }
 
   animate(t) {
@@ -157,8 +149,7 @@ class App {
   }
 
   draw(t) {
-    if (this.isClicked) {
-      // riffle when mouse click
+    if (this.isClicked) { // riffle when mouse click
       this.ripple.draw(this.ctx);
 
       for (let i = 0; i < this.pumpkinDots?.length; i++) {
@@ -171,7 +162,6 @@ class App {
           dot.draw(this.ctx);
         }
       }
-
     } else {
         //background
         this.ctx?.beginPath();

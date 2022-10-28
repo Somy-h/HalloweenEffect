@@ -6,6 +6,9 @@ export default class PumpkinDot {
     this.x = x;
     this.y = y;
 
+    this.targetRadius = radius;
+    this.radius = 0;
+    this.radiusV = 0;
     this.radius = radius;
     this.pixelSize = pixelSize;
     this.red = red;
@@ -22,6 +25,11 @@ export default class PumpkinDot {
       this.pixelSize, 
       this.pixelSize
     );
+
+    const accel = (this.targetRadius - this.radius) / 2;
+    this.radiusV += accel;
+    this.radiusV *= BOUNCE;
+    this.radius += this.radiusV;
 
     ctx.beginPath();
     ctx.fillStyle = `rgb(${this.red}, ${this.green}, ${this.blue})`;
