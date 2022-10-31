@@ -1,3 +1,13 @@
+/*----------------------------- 
+  Created by Soonmyung Hwang
+
+  Huge reference from 
+  Jongmin Kim
+  https://www.youtube.com/watch?v=dXhAQbE8iBg
+  https://youtu.be/kpF0n39xXVM
+  
+ -----------------------------*/
+
 import BounceString from './bounceString.js';
 import Spider from './spider.js';
 import PumpkinDot from "./pumpkinDot.js";
